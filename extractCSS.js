@@ -29,8 +29,6 @@
 		}
 		isRunning = true;
 
-		//document.boo();
-
 		width = html.offsetWidth;
 		height = global.innerHeight;
 		mediaStylesheets = Array.prototype.slice.call(doc.styleSheets).filter(function (stylesheet) {
@@ -83,12 +81,8 @@
 				return outputRules(filterCSS(css, elements));
 			}).join("");
 
-			if (typeof global.callPhantom === "function") {
-				global.callPhantom({ css: CSS });
-			}
-			else if (global.console) {
-				console.log({ css: CSS });
-			}
+			console.log('_extractedcss', {css: CSS });
+
 			isRunning = false;
 		}
 
