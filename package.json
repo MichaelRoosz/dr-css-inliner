@@ -1,6 +1,6 @@
 {
-  "name": "dr-css-inliner",
-  "version": "0.6.0",
+  "name": "@michaelheerklotz/dr-css-inliner",
+  "version": "0.7.0",
   "description": "Puppeteer script to inline above-the-fold CSS for a webpage.",
   "main": "index.js",
   "dependencies": {
@@ -8,7 +8,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/drdk/dr-css-inliner.git"
+    "url": "https://github.com/MichaelHeerklotz/dr-css-inliner.git"
   },
   "keywords": [
     "puppeteer",
@@ -16,8 +16,11 @@
     "css"
   ],
   "author": "rasmusfl0e",
+  "contributors": [
+    "Michael Heerklotz"
+  ],
   "license": "BSD-2-Clause",
   "bugs": {
-    "url": "https://github.com/drdk/dr-css-inliner/issues"
+    "url": "https://github.com/MichaelHeerklotz/dr-css-inliner/issues"
   }
 }
