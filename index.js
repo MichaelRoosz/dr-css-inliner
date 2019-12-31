@@ -57,7 +57,7 @@ while (args.length) {
 		case "--width":
 			value = (args.length) ? args.shift() : "";
 			if (value.match(/^\d+$/)) {
-				width = value;
+				width = parseInt(value);
 			}
 			else {
 				fail("Expected numeric value for '--width' option");
@@ -68,7 +68,7 @@ while (args.length) {
 		case "--height":
 			value = (args.length) ? args.shift() : "";
 			if (value.match(/^\d+$/)) {
-				height = value;
+				height = parseInt(value);
 			}
 			else {
 				fail("Expected numeric value for '--height' option");
