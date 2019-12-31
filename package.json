@@ -3,6 +3,9 @@
   "version": "0.7.1",
   "description": "Puppeteer script to inline above-the-fold CSS for a webpage.",
   "main": "index.js",
+  "bin": {
+    "dr-css-inliner": "index.js"
+  },
   "dependencies": {
     "puppeteer": "^2.0.0"
   },
