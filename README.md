@@ -36,12 +36,14 @@ node index.js <url> [options]
 * `-h, --height [value]` - Determines the above-the-fold height. Defaults to the actual document height.
 * `-m, --match-media-queries` - Omit media queries that don't match the defined width.
 * `-r, --required-selectors [string]` - Force inclusion of required selectors in the form of a comma-separated selector string or an array (as a JSON string) of regexp strings (remember to escape `.`, `[` and `]` etc). Defaults to no required selectors.
-* `-s, --strip-resources [string]` - Avoid loading resources (while extracting CSS) matching the string or array (as a JSON string) of strings turned into regexp pattern(s). Used to speed up execution of CSS inlining. Default is no stripping of resources.
+* `-s, --strip-resources [string]` - Avoid loading resources (while extracting CSS) matching the string or array (as a JSON string) of strings turned into regexp pattern(s). Used to speed up execution of CSS inlining. Default is no stripping of resources. Warning: when stripping is used caching is not possible.
 * `-c, --css-only` - Output the raw required CSS without wrapping it in HTML.
 * `-e, --expose-stylesheets [string]` - A variable name (or property on a preexisting variable) to expose an array containing information about the stripped stylesheets in an inline script tag.
 * `-t, --insertion-token [string]` - A token (preferably an HTML comment) to control the exact insertion point of the inlined CSS. If omited default insertion is at the first encountered stylesheet.
 * `-i, --css-id [string]` - Determines the id attribute of the inline style tag. By default no id is added.
 * `-f,  --fake-url` - Defines a _fake_ url context. Required when piping in html through `stdin`. Default is null.
+* `-dcd, --disk-cache-dir [path]` - Redirect the chroumium cache folder to this path.
+* `-u, --user-agent [string]` - Set the user agent.
 * `-d, --debug` - Prints out an HTML comment in the bottom of the output that exposes some info:
   * `time` - The time in ms it took to run the script (not including the puppeteer process itself).
   * `loadTime` - The time in ms it took to load the webpage.
@@ -372,6 +374,11 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+
+### 0.7.1
+
+ * `-dcd, --disk-cache-dir [path]` option added.
+ * `-u, --user-agent [string]` option added.
 
 ### 0.7.0
 

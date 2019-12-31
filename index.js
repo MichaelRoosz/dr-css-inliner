@@ -28,6 +28,8 @@ var stripResources;
 var localStorage;
 var outputDebug;
 var outputPath;
+var diskCacheDir;
+var userAgent;
 var scriptPath =  __dirname + "/extractCSS.js";
 
 
@@ -185,6 +187,27 @@ while (args.length) {
 			outputDebug = true;
 			break;
 
+		case "-dcd":
+		case "--disk-cache-dir":
+			value = (args.length) ? args.shift() : "";
+			if (value) {
+				diskCacheDir = value;
+			}
+			else {
+				fail("Expected a string for '--disk-cache-dir' option");
+			}
+			break;
+
+		case "-u":
+		case "--user-agent":
+			if (value) {
+				userAgent = value;
+			}
+			else {
+				fail("Expected a string for '--user-agent' option");
+			}
+			break;
+
 		default:
 			if (!url && !arg.match(/^--?[a-z]/)) {
 				url = arg;
@@ -199,49 +222,60 @@ while (args.length) {
 
 (async () => {
 
-	var browser = await puppeteer.launch();
+	var launchOptions = { args: [] };
+
+	if (diskCacheDir) {
+		launchOptions.args.push('--disk-cache-dir=' + diskCacheDir);
+	}
+
+	var browser = await puppeteer.launch(launchOptions);
+
 	var page = await browser.newPage();
 
-	await page.setUserAgent('cssextract');
+	if (userAgent) {
+		await page.setUserAgent(userAgent);
+	}
 
 	await page.setViewport({
 		width: width,
 		height: height || 800
 	});
 
-	await page.setRequestInterception(true);
+	if (stripResources) {
+		await page.setRequestInterception(true);
 
-	var baseUrl = url || fakeUrl;
-
-	page.on('request', request => {
-
-		var _url = request.url();
-
-		if (_url.indexOf(baseUrl) > -1) {
-			_url = _url.slice(baseUrl.length);
-		}
-
-		if (outputDebug && !_url.match(/^data/) && debug.requests.indexOf(_url) < 0) {
-			debug.requests.push(_url);
-		}
-
-		if (stripResources) {
-			var i = 0;
-			var l = stripResources.length;
-			// /http:\/\/.+?\.(jpg|png|svg|gif)$/gi
-			while (i < l) {
-				if (stripResources[i++].test(_url)) {
-					if (outputDebug) {
-						debug.stripped.push(_url);
+		var baseUrl = url || fakeUrl;
+	
+		page.on('request', request => {
+	
+			var _url = request.url();
+	
+			if (_url.indexOf(baseUrl) > -1) {
+				_url = _url.slice(baseUrl.length);
+			}
+	
+			if (outputDebug && !_url.match(/^data/) && debug.requests.indexOf(_url) < 0) {
+				debug.requests.push(_url);
+			}
+	
+			if (stripResources) {
+				var i = 0;
+				var l = stripResources.length;
+				// /http:\/\/.+?\.(jpg|png|svg|gif)$/gi
+				while (i < l) {
+					if (stripResources[i++].test(_url)) {
+						if (outputDebug) {
+							debug.stripped.push(_url);
+						}
+						request.abort();
+						return;
 					}
-					request.abort();
-					return;
 				}
 			}
-		}
-
-		request.continue();
-	});
+	
+			request.continue();
+		});	
+	}
 
 	async function cssCallback(response) {
 		
@@ -394,6 +428,15 @@ while (args.length) {
 		});
 
 		await page.goto(fakeUrl);
+
+		if (!stripResources) {
+			// disable request interception to allow caching
+			await page.setRequestInterception(false);
+		}
+
+		if (diskCacheDir) {
+			await page.setCacheEnabled(true);
+		}
 
 		await page.setContent(html);
 	}
