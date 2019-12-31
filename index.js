@@ -32,6 +32,7 @@ var outputDebug;
 var outputPath;
 var diskCacheDir;
 var userAgent;
+var browserTimeout = 30000;
 var scriptPath =  __dirname + "/extractCSS.js";
 
 
@@ -211,6 +212,17 @@ while (args.length) {
 			}
 			break;
 
+		case "-b":
+		case "--browser-timeout":
+			value = (args.length) ? args.shift() : "";
+			if (value.match(/^\d+$/)) {
+				browserTimeout = parseInt(value);
+			}
+			else {
+				fail("Expected numeric value for '--browser-timeout' option");
+			}
+			break;
+
 		default:
 			if (!url && !arg.match(/^--?[a-z]/)) {
 				url = arg;
@@ -287,7 +299,6 @@ while (args.length) {
 			return;
 		}
 
-
 		await browser.close();
 
 		if ("css" in response) {
@@ -329,16 +340,7 @@ while (args.length) {
 	async function pageLoadFinished() {
 
 		if (!html) {
-			html = await page.evaluate(function () {
-				var xhr = new XMLHttpRequest();
-				var html;
-				xhr.open("get", window.location.href, false);
-				xhr.onload = function () {
-					html = xhr.responseText;
-				};
-				xhr.send();
-				return html;
-			});
+			html = await page.content();
 		}
 
 		if(html.indexOf('stylesheet') === -1) {
@@ -403,6 +405,13 @@ while (args.length) {
 			fail("Unable to locate script at: " + scriptPath);
 		}
 		await page.addScriptTag({path: scriptPath});
+
+		if (browserTimeout) {
+			setTimeout(async function () {
+				await browser.close();
+				fail("Browser timeout");
+			}, browserTimeout);
+		}
 	};
 
 	if (url) {
@@ -417,8 +426,7 @@ while (args.length) {
 			fail("Missing \"fake-url\" option");
 		}
 	
-		html = process.stdin.read();
-		process.stdin.close();
+		html = fs.readFileSync(0, 'utf-8');
 	
 		debug.loadTime = new Date();
 

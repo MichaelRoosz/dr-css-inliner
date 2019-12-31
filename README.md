@@ -44,6 +44,7 @@ node index.js <url> [options]
 * `-f,  --fake-url` - Defines a _fake_ url context. Required when piping in html through `stdin`. Default is null.
 * `-dcd, --disk-cache-dir [path]` - Redirect the chroumium cache folder to this path.
 * `-u, --user-agent [string]` - Set the user agent.
+* `-b, --browser-timeout` - Set the browser timeout in ms. Defaults to 30000 (30 seconds).
 * `-d, --debug` - Prints out an HTML comment in the bottom of the output that exposes some info:
   * `time` - The time in ms it took to run the script (not including the puppeteer process itself).
   * `loadTime` - The time in ms it took to load the webpage.
