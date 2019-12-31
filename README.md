@@ -376,6 +376,27 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.7.6
+
+* README.md updated.
+
+### 0.7.5
+
+* `--fake-url` option fixed.
+* `-b, --browser-timeout` option added.
+
+### 0.7.4
+
+* `--width` and `--height` options fixed.
+
+### 0.7.3
+
+* `--user-agent` option fixed.
+
+### 0.7.2
+
+* `bin` config added to package.json.
+
 ### 0.7.1
 
  * `-dcd, --disk-cache-dir [path]` option added.
