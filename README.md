@@ -421,7 +421,3 @@ Changes:
 ### 0.5.4
 
 `css-inliner` bin removed due to not working on unix.
-
-
-
-[![Analytics](https://ga-beacon.appspot.com/UA-8318361-2/drdk/dr-css-inliner)](https://github.com/igrigorik/ga-beacon)
