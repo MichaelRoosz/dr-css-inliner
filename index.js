@@ -202,6 +202,7 @@ while (args.length) {
 
 		case "-u":
 		case "--user-agent":
+			value = (args.length) ? args.shift() : "";
 			if (value) {
 				userAgent = value;
 			}
