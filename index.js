@@ -426,7 +426,7 @@ while (args.length) {
 			fail("Missing \"fake-url\" option");
 		}
 	
-		html = fs.readFileSync(0, 'utf-8');
+		html = fs.readFileSync(process.stdin.fd, 'utf-8');
 	
 		debug.loadTime = new Date();
 
