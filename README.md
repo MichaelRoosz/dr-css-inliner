@@ -377,6 +377,16 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.7.8
+
+* README.md updated.
+
+### 0.7.7
+
+* `-ihe, --ignore-https-errors` option added.
+* npm "bin" config fixed.
+* Fixed problems with stdin and stdout (removed process.exit calls).
+
 ### 0.7.6
 
 * README.md updated.
