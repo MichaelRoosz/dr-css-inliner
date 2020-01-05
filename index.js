@@ -32,6 +32,7 @@ var outputDebug;
 var outputPath;
 var diskCacheDir;
 var userAgent;
+var ignoreHttpsErrors = false;
 var browserTimeout = 30000;
 var browserTimeoutHandle = null;
 var scriptPath =  __dirname + "/extractCSS.js";
@@ -225,6 +226,11 @@ while (args.length) {
 			}
 			break;
 
+		case "-ihe":
+		case "--ignore-https-errors":
+			ignoreHttpsErrors = true;
+			break;
+
 		case "-b":
 		case "--browser-timeout":
 			value = (args.length) ? args.shift() : "";
@@ -252,7 +258,10 @@ while (args.length) {
 
 (async () => {
 
-	var launchOptions = { args: [] };
+	var launchOptions = {
+		ignoreHTTPSErrors: ignoreHttpsErrors,
+		args: [] 
+	};
 
 	if (diskCacheDir) {
 		launchOptions.args.push('--disk-cache-dir=' + diskCacheDir);
@@ -573,7 +582,9 @@ function outputError (context, msg, trace) {
 	var errStack = [msg];
 	var errInRemoteScript = false;
 
+	//TODO fix trace output
 	trace = false;
+
 	if (trace && trace.length) {
 		errStack.push("TRACE:");
 		trace.forEach(function (t) {

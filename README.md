@@ -41,9 +41,10 @@ node index.js <url> [options]
 * `-e, --expose-stylesheets [string]` - A variable name (or property on a preexisting variable) to expose an array containing information about the stripped stylesheets in an inline script tag.
 * `-t, --insertion-token [string]` - A token (preferably an HTML comment) to control the exact insertion point of the inlined CSS. If omited default insertion is at the first encountered stylesheet.
 * `-i, --css-id [string]` - Determines the id attribute of the inline style tag. By default no id is added.
-* `-f,  --fake-url` - Defines a _fake_ url context. Required when piping in html through `stdin`. Default is null.
+* `-f,  --fake-url [url]` - Defines a _fake_ url context. Required when piping in html through `stdin`. Default is null.
 * `-dcd, --disk-cache-dir [path]` - Redirect the chroumium cache folder to this path.
 * `-u, --user-agent [string]` - Set the user agent.
+* `-ihe, --ignore-https-errors` - Ignore HTTPS errors (for example invalid certificates).
 * `-b, --browser-timeout [value]` - Set the browser timeout in ms. Defaults to 30000 (30 seconds).
 * `-d, --debug` - Prints out an HTML comment in the bottom of the output that exposes some info:
   * `time` - The time in ms it took to run the script (not including the puppeteer process itself).
