@@ -33,6 +33,7 @@ var outputPath;
 var diskCacheDir;
 var userAgent;
 var browserTimeout = 30000;
+var browserTimeoutHandle = null;
 var scriptPath =  __dirname + "/extractCSS.js";
 
 
@@ -50,7 +51,8 @@ while (args.length) {
 				fakeUrl = value;
 			}
 			else {
-				fail("Expected string for '--fake-url' option");
+				stderr("Expected string for '--fake-url' option");
+				return;
 			}
 			break;
 
@@ -61,7 +63,8 @@ while (args.length) {
 				width = parseInt(value);
 			}
 			else {
-				fail("Expected numeric value for '--width' option");
+				stderr("Expected numeric value for '--width' option");
+				return;
 			}
 			break;
 
@@ -72,7 +75,8 @@ while (args.length) {
 				height = parseInt(value);
 			}
 			else {
-				fail("Expected numeric value for '--height' option");
+				stderr("Expected numeric value for '--height' option");
+				return;
 			}
 			break;
 
@@ -97,7 +101,8 @@ while (args.length) {
 				required = value;
 			}
 			else {
-				fail("Expected a string for '--required-selectors' option");
+				stderr("Expected a string for '--required-selectors' option");
+				return;
 			}
 			break;
 
@@ -108,7 +113,8 @@ while (args.length) {
 				exposeStylesheets = ((value.indexOf(".") > -1) ? "" : "var ") + value;
 			}
 			else {
-				fail("Expected a string for '--expose-stylesheets' option");
+				stderr("Expected a string for '--expose-stylesheets' option");
+				return;
 			}
 			break;
 
@@ -124,7 +130,8 @@ while (args.length) {
 				cssToken = parseString(value);
 			}
 			else {
-				fail("Expected a string for '--insertion-token' option");
+				stderr("Expected a string for '--insertion-token' option");
+				return;
 			}
 			break;
 
@@ -135,7 +142,8 @@ while (args.length) {
 				cssId = value;
 			}
 			else {
-				fail("Expected a string for '--css-id' option");
+				stderr("Expected a string for '--css-id' option");
+				return;
 			}
 			break;
 
@@ -154,7 +162,8 @@ while (args.length) {
 				stripResources = value;
 			}
 			else {
-				fail("Expected a string for '--strip-resources' option");
+				stderr("Expected a string for '--strip-resources' option");
+				return;
 			}
 			break;
 
@@ -165,7 +174,8 @@ while (args.length) {
 				localStorage = parseString(value);
 			}
 			else {
-				fail("Expected a string for '--local-storage' option");
+				stderr("Expected a string for '--local-storage' option");
+				return;
 			}
 			break;
 
@@ -181,7 +191,8 @@ while (args.length) {
 				outputPath = value;
 			}
 			else {
-				fail("Expected a string for '--output' option");
+				stderr("Expected a string for '--output' option");
+				return;
 			}
 			break;
 
@@ -197,7 +208,8 @@ while (args.length) {
 				diskCacheDir = value;
 			}
 			else {
-				fail("Expected a string for '--disk-cache-dir' option");
+				stderr("Expected a string for '--disk-cache-dir' option");
+				return;
 			}
 			break;
 
@@ -208,7 +220,8 @@ while (args.length) {
 				userAgent = value;
 			}
 			else {
-				fail("Expected a string for '--user-agent' option");
+				stderr("Expected a string for '--user-agent' option");
+				return;
 			}
 			break;
 
@@ -219,7 +232,8 @@ while (args.length) {
 				browserTimeout = parseInt(value);
 			}
 			else {
-				fail("Expected numeric value for '--browser-timeout' option");
+				stderr("Expected numeric value for '--browser-timeout' option");
+				return;
 			}
 			break;
 
@@ -228,7 +242,8 @@ while (args.length) {
 				url = arg;
 			}
 			else {
-				fail("Unknown option");
+				stderr("Unknown option");
+				return;
 			}
 			break;
 	}
@@ -244,8 +259,26 @@ while (args.length) {
 	}
 
 	var browser = await puppeteer.launch(launchOptions);
-
 	var page = await browser.newPage();
+
+	async function closePuppeteer() {
+
+		if (page) {
+			await page.close().catch((e) => {
+				outputError("PUPPETEER ERROR", e.toString(), e.stack);
+			});
+		}
+
+		if (browser) {
+			await browser.close().catch((e) => {
+				outputError("PUPPETEER ERROR", e.toString(), e.stack);
+			});
+		}
+
+		if (browserTimeoutHandle) {
+			clearTimeout(browserTimeoutHandle);
+		}
+	}
 
 	if (userAgent) {
 		await page.setUserAgent(userAgent);
@@ -261,7 +294,7 @@ while (args.length) {
 
 		var baseUrl = url || fakeUrl;
 	
-		page.on('request', request => {
+		page.on("request", request => {
 	
 			var _url = request.url();
 	
@@ -292,59 +325,74 @@ while (args.length) {
 		});	
 	}
 
-	async function cssCallback(response) {
-		
-		if (!response.css) {
-			fail('Browser did not return any CSS');
-			return;
-		}
-
-		await browser.close();
-
-		if ("css" in response) {
-			var result;
-			if (cssOnly) {
-				result = response.css;
-			}
-			else {
-				result = inlineCSS(response.css);
-			}
-			if (outputDebug) {
-				debug.cssLength = response.css.length;
-				debug.time = new Date() - debug.time;
-				debug.processingTime = debug.time - debug.loadTime;
-				result += "\n<!--\n\t" + JSON.stringify(debug) + "\n-->";
-			}
-			if (outputPath) {
-				fs.write(outputPath, result);
-			}
-			else {
-				process.stdout.write(result);
-			}
-			process.exit();
-		}
-		else {
-			process.stdout.write(response);
-			process.exit();
-		}
-	};
-	
 	page.on("pageerror", function(err) {  
-		outputError("PAGE ERROR", err.toString()); 
+		outputError("PAGE ERROR", err.toString(), err.stack); 
 	});
 
 	page.on("error", function (err) {  
-		outputError("PAGE ERROR", err.toString());
+		outputError("PAGE ERROR", err.toString(), err.stack);
 	});
+
+	if(!await loadPage() || !await injectCssExtractor()) {
+		await closePuppeteer();
+	}
+
+	return;
+
+	async function loadPage() {
+
+		if (url) {
 	
-	async function pageLoadFinished() {
+			debug.loadTime = new Date();
+	
+			await page.goto(url);
+
+			return true;
+		}
+		else {
+		
+			if (!fakeUrl) {
+				stderr("Missing \"fake-url\" option");
+				return false;
+			}
+		
+			html = fs.readFileSync(0, "utf-8");
+		
+			debug.loadTime = new Date();
+	
+			await page.setRequestInterception(true);
+	
+			page.once("request", req => {
+			  req.respond({
+				body: "<!DOCTYPE html><html><head><title>Empty page</title></head><body><div>Empty page</div></body></html>"
+			  });
+			});
+	
+			await page.goto(fakeUrl);
+	
+			if (!stripResources) {
+				// disable request interception to allow caching
+				await page.setRequestInterception(false);
+			}
+	
+			if (diskCacheDir) {
+				await page.setCacheEnabled(true);
+			}
+	
+			await page.setContent(html);
+
+			return true;
+		}	
+	}
+
+	async function injectCssExtractor() {
 
 		if (!html) {
 			html = await page.content();
 		}
 
-		if(html.indexOf('stylesheet') === -1) {
-			process.exit(1);
+		if(html.indexOf("stylesheet") === -1) {
+			return false;
 		}
 
 		debug.loadTime = new Date() - debug.loadTime;
@@ -392,67 +440,68 @@ while (args.length) {
 				return;
 			}
 
-			if (await msg.args()[0].jsonValue() !== '_extractedcss') {
+			if (await msg.args()[0].jsonValue() !== "_extractedcss") {
 				return;
 			}
 
 			let response = await msg.args()[1].jsonValue();
 
-			await cssCallback(response);
+			await closePuppeteer();
+
+			await cssExtractorCallback(response);
 		});
 
 		if (!fs.lstatSync(scriptPath).isFile()) {
-			fail("Unable to locate script at: " + scriptPath);
+			stderr("Unable to locate script at: " + scriptPath);
+			return false;
 		}
 		await page.addScriptTag({path: scriptPath});
 
 		if (browserTimeout) {
-			setTimeout(async function () {
-				await browser.close();
-				fail("Browser timeout");
+			browserTimeoutHandle = setTimeout(async function () {
+				await closePuppeteer();
+				stderr("Browser timeout");
 			}, browserTimeout);
 		}
+
+		return true;
+	}
+
+	async function cssExtractorCallback(response) {
+		
+		if (!response.css) {
+			stderr("Browser did not return any CSS");
+			return;
+		}
+
+		if ("css" in response) {
+			var result;
+			if (cssOnly) {
+				result = response.css;
+			}
+			else {
+				result = inlineCSS(response.css)
+				if (!result) {
+					return;
+				}
+			}
+			if (outputDebug) {
+				debug.cssLength = response.css.length;
+				debug.time = new Date() - debug.time;
+				debug.processingTime = debug.time - debug.loadTime;
+				result += "\n<!--\n\t" + JSON.stringify(debug) + "\n-->";
+			}
+			if (outputPath) {
+				fs.write(outputPath, result);
+			}
+			else {
+				stdout(result);
+			}
+		}
+		else {
+			stdout(response);
+		}
 	};
-
-	if (url) {
-	
-		debug.loadTime = new Date();
-
-		await page.goto(url);
-	}
-	else {
-	
-		if (!fakeUrl) {
-			fail("Missing \"fake-url\" option");
-		}
-	
-		html = fs.readFileSync(process.stdin.fd, 'utf-8');
-	
-		debug.loadTime = new Date();
-
-		await page.setRequestInterception(true);
-
-		page.once('request', req => {
-		  req.respond({
-			body: '<html><body><div>Empty dummy page</div></body></html>'
-		  });
-		});
-
-		await page.goto(fakeUrl);
-
-		if (!stripResources) {
-			// disable request interception to allow caching
-			await page.setRequestInterception(false);
-		}
-
-		if (diskCacheDir) {
-			await page.setCacheEnabled(true);
-		}
-
-		await page.setContent(html);
-	}
-
-	await pageLoadFinished();
 
 })();
 
@@ -497,7 +546,8 @@ function inlineCSS(css) {
 	var length = cssToken.length;
 
 	if (index == -1) {
-		fail("token not found:\n" + cssToken);
+		stderr("token not found:\n" + cssToken);
+		return false;
 	}
 
 	var replacement = "<style " + ((cssId) ? "id=\"" + cssId + "\" " : "") + "media=\"screen\">\n\t\t\t" + css + "\n\t\t</style>\n";
@@ -522,6 +572,8 @@ function outputError (context, msg, trace) {
 	var errMsg = "";
 	var errStack = [msg];
 	var errInRemoteScript = false;
+
+	trace = false;
 	if (trace && trace.length) {
 		errStack.push("TRACE:");
 		trace.forEach(function (t) {
@@ -537,14 +589,17 @@ function outputError (context, msg, trace) {
 		debug.errors.push(errMsg);
 	}
 	else {
-		fail(context + ": " + errStack.join("\n"));
+		stderr(context + ": " + errStack.join("\n"));
 	}
 	
 }
 
-function fail(message) {
+function stdout(message) {
+	process.stdout.write(message + "\n");
+}
+
+function stderr(message) {
 	process.stderr.write(message + "\n");
-	process.exit(1);
 }
 
 function parseString(value) {
