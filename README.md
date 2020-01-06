@@ -20,13 +20,13 @@ The CSS is inlined as per the supplied options and all stylesheets and style ele
 ## Install
 
 ```
-npm install dr-css-inliner
+npm install dr-css-inliner -g
 ```
 
 ## Usage:
 
 ```
-node index.js <url> [options]
+dr-css-inliner <url> [options]
 ```
 
 #### Options:
@@ -61,27 +61,27 @@ node index.js <url> [options]
 
 Only inline the needed above-the-fold CSS for smaller devices:
 ```
-node index.js http://www.mydomain.com/index.html -w 350 -h 480 -m -o index-mobile.html
+dr-css-inliner http://www.mydomain.com/index.html -w 350 -h 480 -m -o index-mobile.html
 ```
 
 Inline all needed CSS for the above-the-fold content on all devices (default 1200px and smaller):
 ```
-node index.js http://www.mydomain.com/index.html -h 800 -o index-page-top.html
+dr-css-inliner http://www.mydomain.com/index.html -h 800 -o index-page-top.html
 ```
 
 Inline all needed CSS for webpage:
 ```
-node index.js http://www.mydomain.com/index.html -o index-full-page.html
+dr-css-inliner http://www.mydomain.com/index.html -o index-full-page.html
 ```
 
 Inline all needed CSS for webpage with extra required selectors:
 ```
-node index.js http://www.mydomain.com/index.html -r ".foo > .bar, #myId" -o index-full-page.html
+dr-css-inliner http://www.mydomain.com/index.html -r ".foo > .bar, #myId" -o index-full-page.html
 ```
 
 Inline all needed CSS for webpage with extra required regexp selector filters:
 ```
-node index.js http://www.mydomain.com/index.html -r '["\\.foo > ", "\\.span-\\d+"]' -o index-full-page.html
+dr-css-inliner http://www.mydomain.com/index.html -r '["\\.foo > ", "\\.span-\\d+"]' -o index-full-page.html
 ```
 
 ###### Output options
@@ -118,7 +118,7 @@ index.html:
 Doing:
 
 ```
-node index.js index.html
+dr-css-inliner index.html
 ```
 
 ...would get you:
@@ -145,7 +145,7 @@ node index.js index.html
 `-c, --css-only`
 
 ```
-node index.js index.html -c
+dr-css-inliner index.html -c
 ```
 
 ...would get you:
@@ -163,7 +163,7 @@ node index.js index.html -c
 __Single global variable:__
 
 ```
-node index.js index.html -e stylesheets
+dr-css-inliner index.html -e stylesheets
 ```
 
 ...would get you:
@@ -191,7 +191,7 @@ node index.js index.html -e stylesheets
 __Namespaced property:__
 
 ```
-node index.js index.html -e myNamespace.stylesheets
+dr-css-inliner index.html -e myNamespace.stylesheets
 ```
 
 provided you had an `index.html` like:
@@ -263,7 +263,7 @@ provided you had an `index.html` like:
 ```
 
 ```
-node index.js index.html -t "<!-- CSS goes here -->"
+dr-css-inliner index.html -t "<!-- CSS goes here -->"
 ```
 
 ...would get you:
@@ -295,7 +295,7 @@ node index.js index.html -t "<!-- CSS goes here -->"
 Doing:
 
 ```
-node index.js index.html -s '["\\.(jpg|gif|png)$","webstat\\.js$"]'
+dr-css-inliner index.html -s '["\\.(jpg|gif|png)$","webstat\\.js$"]'
 ```
 
 ... would avoid loading images and a given web statistic script.
@@ -306,7 +306,7 @@ node index.js index.html -s '["\\.(jpg|gif|png)$","webstat\\.js$"]'
 
 Doing:
 ```
-node index.js index.html -d
+dr-css-inliner index.html -d
 ```
 
 ...would get you:
@@ -338,7 +338,7 @@ node index.js index.html -d
 
 Doing:
 ```
-node index.js index.html -i my-inline-css
+dr-css-inliner index.html -i my-inline-css
 ```
 
 ...would get you:
@@ -367,7 +367,7 @@ node index.js index.html -i my-inline-css
 If you need to parse HTML that is not yet publicly available you can pipe it into `dr-css-inliner`. Below is a contrived example (in a real-world example imagine an httpfilter or similar in place of `cat`):
 
 ```
-cat not-yet-public.html | node index.js -f http://www.mydomain.com/index.html
+cat not-yet-public.html | dr-css-inliner -f http://www.mydomain.com/index.html
 ```
 
 All loading of assets will be loaded relative to the _fake_ url - meaning they need to be available already.
@@ -376,6 +376,11 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+
+### 0.8.0
+
+* Better error handling.
+* Added console options info.
 
 ### 0.7.9
 

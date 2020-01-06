@@ -9,6 +9,7 @@ var debug = {
 	cssLength: 0
 };
 
+var path = require('path');
 var fs = require("fs");
 var process = require("process");
 var puppeteer = require("puppeteer");
@@ -36,6 +37,20 @@ var browserTimeout = 30000;
 var browserTimeoutHandle = null;
 var scriptPath =  __dirname + "/extractCSS.js";
 
+if (args.length < 1) {
+
+	try {
+	  stdout(fs.readFileSync(path.resolve(__dirname, 'README.md'), 'utf8')
+		  .match(/## Usage:([\s\S]*?)##### Examples:/i)[1]
+		  .replace(/\n```\n/g,'')
+		  .replace(/#### Options:/,'\nOptions:')
+		  .replace(/node index.js/g, 'dr-css-inliner'));
+	} catch (e) {
+	  stderr('Off-line `dr-css-inliner` help is not available!');
+	}
+
+	return;
+}
 
 while (args.length) {
 	arg = args.shift();
@@ -156,7 +171,6 @@ while (args.length) {
 					value = [value];
 				}
 				value = value.map(function (string) {
-					//throw new Error(string);
 					return new RegExp(string, "i");
 				});
 				stripResources = value;
@@ -266,20 +280,20 @@ while (args.length) {
 		launchOptions.args.push('--disk-cache-dir=' + diskCacheDir);
 	}
 
-	var browser = await puppeteer.launch(launchOptions);
-	var page = await browser.newPage();
+	var browser;
+	var page;
 
 	async function closePuppeteer() {
 
 		if (page) {
 			await page.close().catch((e) => {
-				outputError("PUPPETEER ERROR", e.toString(), e.stack);
+				outputError("PUPPETEER ERROR", e);
 			});
 		}
 
 		if (browser) {
 			await browser.close().catch((e) => {
-				outputError("PUPPETEER ERROR", e.toString(), e.stack);
+				outputError("PUPPETEER ERROR", e);
 			});
 		}
 
@@ -288,61 +302,73 @@ while (args.length) {
 		}
 	}
 
-	if (userAgent) {
-		await page.setUserAgent(userAgent);
-	}
+	try {
+		browser = await puppeteer.launch(launchOptions);
+		page = await browser.newPage();
 
-	await page.setViewport({
-		width: width,
-		height: height || 800
-	});
+		if (userAgent) {
+			await page.setUserAgent(userAgent);
+		}
 
-	if (stripResources) {
-		await page.setRequestInterception(true);
+		await page.setViewport({
+			width: width,
+			height: height || 800
+		});
 
-		var baseUrl = url || fakeUrl;
-	
-		page.on("request", request => {
-	
-			var _url = request.url();
-	
-			if (_url.indexOf(baseUrl) > -1) {
-				_url = _url.slice(baseUrl.length);
-			}
-	
-			if (outputDebug && !_url.match(/^data/) && debug.requests.indexOf(_url) < 0) {
-				debug.requests.push(_url);
-			}
-	
-			if (stripResources) {
-				var i = 0;
-				var l = stripResources.length;
-				// /http:\/\/.+?\.(jpg|png|svg|gif)$/gi
-				while (i < l) {
-					if (stripResources[i++].test(_url)) {
-						if (outputDebug) {
-							debug.stripped.push(_url);
+		if (stripResources) {
+			await page.setRequestInterception(true);
+
+			var baseUrl = url || fakeUrl;
+		
+			page.on("request", request => {
+		
+				var _url = request.url();
+		
+				if (_url.indexOf(baseUrl) > -1) {
+					_url = _url.slice(baseUrl.length);
+				}
+		
+				if (outputDebug && !_url.match(/^data/) && debug.requests.indexOf(_url) < 0) {
+					debug.requests.push(_url);
+				}
+		
+				if (stripResources) {
+					var i = 0;
+					var l = stripResources.length;
+					// /http:\/\/.+?\.(jpg|png|svg|gif)$/gi
+					while (i < l) {
+						if (stripResources[i++].test(_url)) {
+							if (outputDebug) {
+								debug.stripped.push(_url);
+							}
+							request.abort();
+							return;
 						}
-						request.abort();
-						return;
 					}
 				}
-			}
-	
-			request.continue();
-		});	
+		
+				request.continue();
+			});	
+		}
+
+		page.on("pageerror", function(err) {  
+			outputError("PAGE ERROR", err); 
+		});
+
+		page.on("error", function (err) {  
+			outputError("PAGE ERROR", err);
+		});
+
+		if(!await loadPage() || !await injectCssExtractor()) {
+			await closePuppeteer();
+		}
+
 	}
-
-	page.on("pageerror", function(err) {  
-		outputError("PAGE ERROR", err.toString(), err.stack); 
-	});
-
-	page.on("error", function (err) {  
-		outputError("PAGE ERROR", err.toString(), err.stack);
-	});
-
-	if(!await loadPage() || !await injectCssExtractor()) {
-		await closePuppeteer();
+	catch (e) {
+		outputError("EXCEPTION", e);
+		try {
+			await closePuppeteer();
+		} catch (err) {}
 	}
 
 	return;
@@ -576,32 +602,12 @@ function inlineCSS(css) {
 
 }
 
-function outputError (context, msg, trace) {
-	var errMsg = "";
-	var errStack = [msg];
-	var errInRemoteScript = false;
+function outputError(context, msg) {
 
-	//TODO fix trace output
-	trace = false;
+	var error = msg.stack ? msg.stack : msg;
 
-	if (trace && trace.length) {
-		errStack.push("TRACE:");
-		trace.forEach(function (t) {
-			var source = t.file || t.sourceURL;
-			if (!errInRemoteScript && source != scriptPath) {
-				errInRemoteScript = true;
-			}
-			errStack.push(" -> " + source + ": " + t.line + (t.function ? " (in function " + t.function + ")" : ""));
-		});
-	}
-	errMsg = errStack.join("\n");
-	if (errInRemoteScript) {
-		debug.errors.push(errMsg);
-	}
-	else {
-		stderr(context + ": " + errStack.join("\n"));
-	}
-	
+	debug.errors.push(error);
+	stderr(context + ": " + error);
 }
 
 function stdout(message) {
