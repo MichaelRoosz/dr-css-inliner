@@ -377,6 +377,10 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.7.9
+
+* Extractor now waits until preloaded css (link with rel="preload" and as="style") has finished loading.
+
 ### 0.7.8
 
 * README.md updated.
