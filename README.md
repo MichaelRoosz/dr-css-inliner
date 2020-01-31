@@ -377,6 +377,13 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.8.1
+* Fixed first css selector being ignored when the css file starts with a @charset declaration.
+* Fixed crash when trying to write output file.
+* Fixed page html retrieval.
+* Fixed loading cross-origin css files.
+* Fixed setting viewport.
+
 ### 0.8.0
 
 * Better error handling.
