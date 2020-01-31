@@ -473,10 +473,10 @@ while (args.length) {
 			var _height = await page.evaluate(function () {
 				return document.body.offsetHeight;
 			});
-			page.setViewport = {
+			await page.setViewport({
 				width: width,
 				height: _height
-			};
+			});
 		}
 	
 		await page.on("console", async msg => {
@@ -537,7 +537,7 @@ while (args.length) {
 				result += "\n<!--\n\t" + JSON.stringify(debug) + "\n-->";
 			}
 			if (outputPath) {
-				fs.writeFile(outputPath, result);
+				fs.writeFileSync(outputPath, result);
 			}
 			else {
 				stdout(result);
