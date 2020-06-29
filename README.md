@@ -377,6 +377,9 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.8.3
+* Fixed height behavior.
+
 ### 0.8.2
 * Fixed writing output file.
 * Fixed setting viewport.

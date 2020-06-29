@@ -471,7 +471,7 @@ while (args.length) {
 	
 		if (!height) {
 			var _height = await page.evaluate(function () {
-				return document.body.offsetHeight;
+				return document.body.scrollHeight;
 			});
 			await page.setViewport({
 				width: width,

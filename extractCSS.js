@@ -88,7 +88,7 @@
 
 			// if viewport height is forced
 			// define elements to check seletors against
-			if (html.offsetHeight != height) {
+			if (html.scrollHeight != height) {
 				elements = Array.prototype.slice.call(doc.getElementsByTagName("*")).filter(function (element) {
 					return (element.getBoundingClientRect().top < height);
 				});
