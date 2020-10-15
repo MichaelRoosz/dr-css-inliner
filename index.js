@@ -22,7 +22,7 @@ var height = 0;
 var matchMQ;
 var required;
 var prefetch;
-var cssOnly = false;
+var cssOnly;
 var cssId;
 var cssToken;
 var exposeStylesheets;
@@ -35,6 +35,7 @@ var userAgent;
 var ignoreHttpsErrors = false;
 var browserTimeout = 30000;
 var browserTimeoutHandle = null;
+var noSandbox;
 var scriptPath =  __dirname + "/extractCSS.js";
 
 if (args.length < 1) {
@@ -256,6 +257,11 @@ while (args.length) {
 			}
 			break;
 
+		case "-ns":
+		case "--no-sandbox":
+			noSandbox = true;
+			break;
+
 		default:
 			if (!url && !arg.match(/^--?[a-z]/)) {
 				url = arg;
@@ -280,6 +286,11 @@ while (args.length) {
 
 	if (diskCacheDir) {
 		launchOptions.args.push('--disk-cache-dir=' + diskCacheDir);
+	}
+
+	if (noSandbox) {
+		launchOptions.args.push('--no-sandbox');
+		launchOptions.args.push('--disable-setuid-sandbox');
 	}
 
 	var browser;
