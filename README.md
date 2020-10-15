@@ -45,6 +45,7 @@ dr-css-inliner <url> [options]
 * `-dcd, --disk-cache-dir [path]` - Redirect the chroumium cache folder to this path.
 * `-u, --user-agent [string]` - Set the user agent.
 * `-ihe, --ignore-https-errors` - Ignore HTTPS errors (for example invalid certificates).
+* `-ns, --no-sandbox` - Disable Browser sandboxing (only disable if really needed - security risk!).
 * `-b, --browser-timeout [value]` - Set the browser timeout in ms. Defaults to 30000 (30 seconds).
 * `-d, --debug` - Prints out an HTML comment in the bottom of the output that exposes some info:
   * `time` - The time in ms it took to run the script (not including the puppeteer process itself).
@@ -376,6 +377,9 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+
+### 0.8.5
+* README.md updated.
 
 ### 0.8.4
 * `-ns, --no-sandbox` option added.
