@@ -377,6 +377,10 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.8.4
+* `-ns, --no-sandbox` option added.
+* Raised puppeteer version to 5.3.1.
+
 ### 0.8.3
 * Fixed height behavior.
 
