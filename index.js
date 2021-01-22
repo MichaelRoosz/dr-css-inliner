@@ -11,6 +11,7 @@ var debug = {
 
 var path = require('path');
 var fs = require("fs");
+var rw = require("rw");
 var process = require("process");
 var puppeteer = require("puppeteer");
 
@@ -403,7 +404,7 @@ while (args.length) {
 				return false;
 			}
 		
-			html = fs.readFileSync(0, "utf-8");
+			html = rw.readFileSync("/dev/stdin", "utf-8");
 		
 			debug.loadTime = new Date();
 	
