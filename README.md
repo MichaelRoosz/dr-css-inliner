@@ -377,11 +377,15 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+### 0.8.8
+* fixed npmjs tags
 
 ### 0.8.7
 * now using rw module to read from stdin
+
 ## 0.8.6
 * Raised puppeteer version to 5.5.0.
+
 ### 0.8.5
 * README.md updated.
 
