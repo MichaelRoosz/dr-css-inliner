@@ -37,6 +37,7 @@ var ignoreHttpsErrors = false;
 var browserTimeout = 30000;
 var browserTimeoutHandle = null;
 var noSandbox;
+var noGpu;
 var scriptPath =  __dirname + "/extractCSS.js";
 
 if (args.length < 1) {
@@ -263,6 +264,11 @@ while (args.length) {
 			noSandbox = true;
 			break;
 
+		case "-ngpu":
+			case "--no-gpu":
+				noGpu = true;
+				break;		
+
 		default:
 			if (!url && !arg.match(/^--?[a-z]/)) {
 				url = arg;
@@ -292,6 +298,10 @@ while (args.length) {
 	if (noSandbox) {
 		launchOptions.args.push('--no-sandbox');
 		launchOptions.args.push('--disable-setuid-sandbox');
+	}
+
+	if (noGpu) {
+		launchOptions.args.push('--disable-gpu');
 	}
 
 	var browser;
