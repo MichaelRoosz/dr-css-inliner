@@ -377,6 +377,10 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+### 0.8.9
+* `-ngpu, --no-gpu` option added.
+* Raised puppeteer version to 10.2.0.
+
 ### 0.8.8
 * fixed npmjs tags
 
