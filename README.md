@@ -379,6 +379,9 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+### 0.8.11
+* Fixed package-lock.json.
+
 ### 0.8.10
 * README.md updated.
 ### 0.8.9
