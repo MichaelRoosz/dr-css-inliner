@@ -46,6 +46,7 @@ dr-css-inliner <url> [options]
 * `-u, --user-agent [string]` - Set the user agent.
 * `-ihe, --ignore-https-errors` - Ignore HTTPS errors (for example invalid certificates).
 * `-ns, --no-sandbox` - Disable Browser sandboxing (only disable if really needed - security risk!).
+* `-ngpu, --no-gpu` - Disable GPU hardware acceleration (may help if crashing in a docker container and/or alpine).
 * `-b, --browser-timeout [value]` - Set the browser timeout in ms. Defaults to 30000 (30 seconds).
 * `-d, --debug` - Prints out an HTML comment in the bottom of the output that exposes some info:
   * `time` - The time in ms it took to run the script (not including the puppeteer process itself).
