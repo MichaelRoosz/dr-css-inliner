@@ -378,6 +378,8 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+### 0.8.12
+* Fixed for puppeteer versions >= 10
 
 ### 0.8.11
 * Fixed package-lock.json.
