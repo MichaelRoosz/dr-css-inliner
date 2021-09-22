@@ -428,11 +428,6 @@ while (args.length) {
 	
 			await page.goto(fakeUrl);
 	
-			if (!stripResources) {
-				// disable request interception to allow caching
-				await page.setRequestInterception(false);
-			}
-	
 			if (diskCacheDir) {
 				await page.setCacheEnabled(true);
 			}
