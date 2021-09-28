@@ -63,7 +63,7 @@ while (args.length) {
 		case "--fake-url":
 			value = (args.length) ? args.shift() : "";
 			if (value) {
-				if (!value.match(/(\/|\.[^./]+)$/)) {
+				if (!value.match(/(\/|\?.*|\.[^.\/]+)$/)) {
 					value += "/";
 				}
 				fakeUrl = value;
@@ -413,31 +413,44 @@ while (args.length) {
 				stderr("Missing \"fake-url\" option");
 				return false;
 			}
-		
-			html = rw.readFileSync("/dev/stdin", "utf-8");
-		
+
+			if (fs.existsSync("/dev/stdin")) {
+				html = rw.readFileSync("/dev/stdin", "utf-8");
+			} else {
+				function streamToString (stream) {
+					const chunks = [];
+					return new Promise((resolve, reject) => {
+						stream.on('data', (chunk) => chunks.push(Buffer.from(chunk)));
+						stream.on('error', (err) => reject(err));
+						stream.on('end', () => resolve(Buffer.concat(chunks).toString('utf8')));
+					});
+				}
+
+				html = await streamToString(process.stdin);
+			}
+
 			debug.loadTime = new Date();
 	
 			await page.setRequestInterception(true);
 	
-			page.once("request", req => {
-			  req.respond({
-				body: "<!DOCTYPE html><html><head><title>Empty page</title></head><body><div>Empty page</div></body></html>"
-			  });
-			});
-	
-			await page.goto(fakeUrl);
-	
-			if (!stripResources) {
-				// disable request interception to allow caching
-				await page.setRequestInterception(false);
-			}
-	
 			if (diskCacheDir) {
 				await page.setCacheEnabled(true);
 			}
+
+			page.on("request", req => {
+
+				if (req.url() == fakeUrl) {
+					req.respond({
+						body: html
+					});
+
+					return;
+				}
+		
+				req.continue();
+			});
 	
-			await page.setContent(html);
+			await page.goto(fakeUrl);
 
 			return true;
 		}	
