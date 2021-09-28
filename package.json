@@ -1,6 +1,6 @@
 {
   "name": "@michaelheerklotz/dr-css-inliner",
-  "version": "0.8.12-chrome-93",
+  "version": "0.9.0-chrome-93",
   "description": "Puppeteer script to inline above-the-fold CSS for a webpage.",
   "main": "index.js",
   "bin": {
