@@ -378,6 +378,11 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+
+### 0.9.0
+* Fixed --fake-url option for modern puppeteer versions
+* Fixed --fake-url option for windows
+
 ### 0.8.12
 * Fixed for puppeteer versions >= 10
 
