@@ -38,6 +38,7 @@ var browserTimeout = 30000;
 var browserTimeoutHandle = null;
 var noSandbox;
 var noGpu;
+var connect = null;
 var scriptPath =  __dirname + "/extractCSS.js";
 
 if (args.length < 1) {
@@ -265,9 +266,20 @@ while (args.length) {
 			break;
 
 		case "-ngpu":
-			case "--no-gpu":
-				noGpu = true;
-				break;		
+		case "--no-gpu":
+			noGpu = true;
+			break;
+
+		case "--connect":
+			connect = (args.length) ? args.shift() : "";
+			if (value.match(/^\d+$/)) {
+				connect = parseInt(connect);
+			}
+			else {
+				stderr("Expected numeric value for '--connect' option");
+				return;
+			}
+			break;
 
 		default:
 			if (!url && !arg.match(/^--?[a-z]/)) {
@@ -316,9 +328,13 @@ while (args.length) {
 		}
 
 		if (browser) {
-			await browser.close().catch((e) => {
-				outputError("PUPPETEER ERROR", e);
-			});
+			if (connect) {
+				await browser.disconnect();
+			} else {
+				await browser.close().catch((e) => {
+					outputError("PUPPETEER ERROR", e);
+				});
+			}
 		}
 
 		if (browserTimeoutHandle) {
@@ -327,7 +343,15 @@ while (args.length) {
 	}
 
 	try {
-		browser = await puppeteer.launch(launchOptions);
+		if (connect) {
+			browser = await puppeteer.connect({
+				ignoreHTTPSErrors: ignoreHttpsErrors,
+				browserURL: "http://localhost:" + connect
+			});
+		} else {
+			browser = await puppeteer.launch(launchOptions);
+		}
+
 		page = await browser.newPage();
 
 		if (userAgent) {

@@ -56,6 +56,7 @@ dr-css-inliner <url> [options]
   * `stripped` - An array of urls of requests aborted by the `--strip-resources` option.
   * `errors` - An array of errors that ocurred on the page.
   * `cssLength` - The length of the inlined CSS in chars.
+* `--connect [port]` - Do not launch chromium and connect to an already running chromium instance on given port.
 
 ##### Examples:
 
@@ -378,6 +379,9 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+
+### 0.9.1
+* `--connect [port]` option added.
 
 ### 0.9.0
 * Fixed --fake-url option for modern puppeteer versions
