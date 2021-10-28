@@ -271,9 +271,9 @@ while (args.length) {
 			break;
 
 		case "--connect":
-			connect = (args.length) ? args.shift() : "";
+			value = (args.length) ? args.shift() : "";
 			if (value.match(/^\d+$/)) {
-				connect = parseInt(connect);
+				connect = parseInt(value);
 			}
 			else {
 				stderr("Expected numeric value for '--connect' option");
