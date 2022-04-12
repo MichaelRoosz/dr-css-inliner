@@ -236,7 +236,7 @@
 	function parseRule(rule) {
 		var match = rule.match(/^\s*([^{}]+)\s*\{\s*((?:[^{}]+\{[^{}]+\})+|[^{}]+)\s*\}$/);
 		return {
-			selectors: match && match[1].split(/\s*,\s*/),
+			selectors: match && match[1].split(/\s*,\s*(?![^\(\[]*[\]\)])/),
 			css: match && match[2]
 		};
 	}
