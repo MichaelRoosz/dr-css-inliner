@@ -379,6 +379,8 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 ---
 
 ## Changelog
+## 0.9.4
+* Raised puppeteer version to 17.0.0.
 ### 0.9.3
 * Fixed parsing selectors with commas inside brackets.
 
