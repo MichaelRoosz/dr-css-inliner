@@ -380,6 +380,9 @@ All loading of assets will be loaded relative to the _fake_ url - meaning they n
 
 ## Changelog
 
+## 0.9.7
+* Use new Chrome headless mode
+
 ## 0.9.6
 * Update dependencies
 

@@ -1,13 +1,13 @@
 {
   "name": "@michaelheerklotz/dr-css-inliner",
-  "version": "0.9.6",
+  "version": "0.9.7",
   "description": "Puppeteer script to inline above-the-fold CSS for a webpage.",
   "main": "index.js",
   "bin": {
     "dr-css-inliner": "bin/index.js"
   },
   "dependencies": {
-    "puppeteer": "^21.3.7",
+    "puppeteer": "^21.3.8",
     "rw": "^1.3.3"
   },
   "repository": {

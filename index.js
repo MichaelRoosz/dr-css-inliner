@@ -298,6 +298,7 @@ while (args.length) {
 
 	var launchOptions = {
 		ignoreHTTPSErrors: ignoreHttpsErrors,
+		headless: 'new',
 		args: [
 			'--disable-web-security'
 		] 
