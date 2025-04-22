@@ -322,13 +322,14 @@ while (args.length) {
 
 	async function closePuppeteer() {
 
-		if (page) {
-			await page.close().catch((e) => {
-				outputError("PUPPETEER ERROR", e);
-			});
-		}
-
 		if (browser) {
+			const pages = await browser.pages();
+			for (const page of pages) {
+				await page.close().catch((e) => {
+					outputError("PUPPETEER ERROR", e);
+				});
+			}
+
 			if (connect) {
 				await browser.disconnect();
 			} else {
@@ -336,10 +337,13 @@ while (args.length) {
 					outputError("PUPPETEER ERROR", e);
 				});
 			}
+
+			browser = null;
 		}
 
 		if (browserTimeoutHandle) {
 			clearTimeout(browserTimeoutHandle);
+			browserTimeoutHandle = null;
 		}
 	}
 
@@ -408,10 +412,13 @@ while (args.length) {
 			outputError("PAGE ERROR", err);
 		});
 
-		if(!await loadPage() || !await injectCssExtractor()) {
+		if (!(await loadPage())) {
 			await closePuppeteer();
 		}
 
+		if (!(await injectCssExtractor())) {
+			await closePuppeteer();
+		}
 	}
 	catch (e) {
 		outputError("EXCEPTION", e);
@@ -522,7 +529,7 @@ while (args.length) {
 				}
 			}, localStorage);
 		}
-	
+
 		if (Object.keys(options).length) {
 			await page.evaluate(function (options) {
 				window.extractCSSOptions = options;
@@ -538,7 +545,7 @@ while (args.length) {
 				height: _height
 			});
 		}
-	
+
 		await page.on("console", async msg => {
 
 			if (msg.args().length !== 2) {
@@ -551,15 +558,16 @@ while (args.length) {
 
 			let response = await msg.args()[1].jsonValue();
 
-			await closePuppeteer();
-
 			await cssExtractorCallback(response);
+
+			await closePuppeteer();
 		});
 
 		if (!fs.lstatSync(scriptPath).isFile()) {
 			stderr("Unable to locate script at: " + scriptPath);
 			return false;
 		}
+
 		await page.addScriptTag({path: scriptPath});
 
 		if (browserTimeout) {
